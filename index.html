@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多頁面應用程式</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .code-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: #e2e8f0;
+            color: #475569;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            white-space: nowrap; /* Prevent wrapping */
+            min-width: 60px; /* Ensure consistent size */
+        }
+        /* Single search highlight */
+        .code-item.highlight {
+            background-color: #3b82f6; /* Blue-500 */
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+            transform: scale(1.1);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Order marking colors */
+        .order-color-0 { background-color: #22c55e; color: #ffffff; } /* Green */
+        .order-color-1 { background-color: #3b82f6; color: #ffffff; } /* Blue */
+        .order-color-2 { background-color: #f59e0b; color: #ffffff; } /* Yellow */
+        .order-color-3 { background-color: #ec4899; color: #ffffff; } /* Pink */
+        .order-color-4 { background-color: #ef4444; color: #ffffff; } /* Red */
+        .order-color-5 { background-color: #8b5cf6; color: #ffffff; } /* Purple */
+        .order-color-6 { background-color: #14b8a6; color: #ffffff; } /* Teal */
+        .order-color-7 { background-color: #f97316; color: #ffffff; } /* Orange */
+        .order-color-8 { background-color: #6b7280; color: #ffffff; } /* Gray */
+        .order-color-9 { background-color: #06b6d4; color: #ffffff; } /* Cyan */
+        .order-color-10 { background-color: #a855f7; color: #ffffff; } /* Violet */
+        .order-color-11 { background-color: #d946ef; color: #ffffff; } /* Fuchsia */
+
+
+        @keyframes pulse {
+            0% { transform: scale(1.0); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.9); }
+            100% { transform: scale(1.0); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        }
+
+        /* Specific grid layouts for sections (鐵皮屋) */
+        .grid-he-desk {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)); /* Three columns */
+            gap: 10px;
+        }
+        .grid-tin-house-wall, .grid-tin-house-wall-long {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr)); /* Eight columns */
+            gap: 10px;
+        }
+        .grid-tin-house-outer-side, .grid-tin-house-outer-middle {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr)); /* Two columns */
+            gap: 10px;
+        }
+        .grid-tin-house-outer-single {
+            grid-column: span 2; /* Span across both columns */
+            display: flex;
+            justify-content: center;
+        }
+        .grid-tin-house-desk2-top {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)); /* Three columns */
+            gap: 10px;
+        }
+        .grid-tin-house-desk2-long {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr)); /* Eight columns */
+            gap: 10px;
+        }
+
+        /* Specific grid layouts for sections (4F) */
+        .grid-4f-small-room-inner {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr)); /* Adjust columns as needed for 4F sections */
+            gap: 10px;
+        }
+        .grid-4f-partition-wall {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-large-room-wall-edge-1 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-large-room-wall-edge-2 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-small-room-weave-1 {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-small-room-continue-2 {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-bottom-window-1 {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-bottom-window-2 {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-4f-left-wall-1 {
+            display: grid;
+            grid-template-columns: repeat(11, minmax(0, 1fr)); /* Adjusted for this wider section */
+            gap: 10px;
+        }
+        .grid-4f-aluminum-door-2 {
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr)); /* Adjusted for this wider section */
+            gap: 10px;
+        }
+
+        /* Specific grid layouts for sections (3F) */
+        .grid-3f-stairs-red-show {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr)); /* 7 columns based on visual analysis */
+            gap: 10px;
+        }
+        .grid-3f-cabinet-super-long-top {
+            display: grid;
+            grid-template-columns: repeat(11, minmax(0, 1fr)); /* Based on the width of the top codes */
+            gap: 10px;
+        }
+        .grid-3f-cabinet-super-long-middle {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr)); /* Wider middle rows */
+            gap: 10px;
+        }
+        .grid-3f-cabinet-super-long-bottom {
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr)); /* Widest bottom rows */
+            gap: 10px;
+        }
+        .grid-3f-outer-area-row-1 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-outer-area-row-2 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-outer-area-row-3 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-outer-area-row-4 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-outer-area-row-5 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-sealing-table-right-area {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-sealing-table-stone-area {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-pulse-blood-type-2 {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-3f-middle-road-cashbox {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr)); /* Simple 2 column for these */
+            gap: 10px;
+        }
+
+        /* Specific grid layouts for sections (2F) */
+        .grid-2f-sink-outside-wall-shelf {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr)); /* Based on the image */
+            gap: 10px;
+        }
+        .grid-2f-toilet-exit-middle {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-2f-toilet-exit-stairs-side {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-2f-stairs-upper-wall {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-2f-stairs-middle {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-2f-first-light {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr)); /* Very wide section */
+            gap: 10px;
+        }
+        .grid-2f-super-long-middle {
+            display: grid;
+            grid-template-columns: repeat(11, minmax(0, 1fr)); /* Very wide section */
+            gap: 10px;
+        }
+        .grid-2f-computer-desk-front {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .grid-2f-computer-desk-nearby {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)); /* For "2F 電腦 桌 附近" */
+            gap: 10px;
+        }
+        .grid-2f-hard-drive {
+             display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) { /* Adjust column counts for larger mobile/tablet */
+            .grid-tin-house-wall, .grid-tin-house-wall-long, .grid-tin-house-desk2-long {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+            .grid-4f-small-room-inner, .grid-4f-small-room-weave-1, .grid-4f-small-room-continue-2, .grid-4f-bottom-window-1, .grid-4f-bottom-window-2 {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+            .grid-4f-left-wall-1, .grid-4f-aluminum-door-2 {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+            /* 3F Adjustments for tablets */
+            .grid-3f-stairs-red-show, .grid-3f-outer-area-row-1, .grid-3f-outer-area-row-2, .grid-3f-outer-area-row-3, .grid-3f-outer-area-row-4, .grid-3f-outer-area-row-5, .grid-3f-middle-road-cashbox {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .grid-3f-cabinet-super-long-top, .grid-3f-cabinet-super-long-middle, .grid-3f-cabinet-super-long-bottom, .grid-3f-sealing-table-right-area, .grid-3f-sealing-table-stone-area, .grid-3f-pulse-blood-type-2 {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+            /* 2F Adjustments for tablets */
+            .grid-2f-sink-outside-wall-shelf, .grid-2f-toilet-exit-middle, .grid-2f-toilet-exit-stairs-side, .grid-2f-stairs-upper-wall, .grid-2f-stairs-middle, .grid-2f-computer-desk-front, .grid-2f-computer-desk-nearby {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .grid-2f-first-light, .grid-2f-super-long-middle {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .grid-tin-house-wall, .grid-tin-house-wall-long, .grid-tin-house-desk2-long {
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* Four columns on smaller screens */
+            }
+            .grid-tin-house-desk2-top {
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Two columns on smaller screens */
+            }
+            .grid-he-desk { /* Adjust for smaller screens */
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Two columns on smaller screens */
+            }
+            .grid-4f-small-room-inner, .grid-4f-partition-wall, .grid-4f-large-room-wall-edge-1, .grid-4f-large-room-wall-edge-2, .grid-4f-small-room-weave-1, .grid-4f-small-room-continue-2, .grid-4f-bottom-window-1, .grid-4f-bottom-window-2, .grid-4f-left-wall-1, .grid-4f-aluminum-door-2 {
+                grid-template-columns: repeat(3, minmax(0, 1fr)); /* More compact on smaller screens */
+            }
+            /* 3F Adjustments for mobile */
+            .grid-3f-stairs-red-show, .grid-3f-outer-area-row-1, .grid-3f-outer-area-row-2, .grid-3f-outer-area-row-3, .grid-3f-outer-area-row-4, .grid-3f-outer-area-row-5, .grid-3f-middle-road-cashbox {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grid-3f-cabinet-super-long-top, .grid-3f-cabinet-super-long-middle, .grid-3f-cabinet-super-long-bottom, .grid-3f-sealing-table-right-area, .grid-3f-sealing-table-stone-area, .grid-3f-pulse-blood-type-2 {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+            /* 2F Adjustments for mobile */
+            .grid-2f-sink-outside-wall-shelf, .grid-2f-toilet-exit-middle, .grid-2f-toilet-exit-stairs-side, .grid-2f-stairs-upper-wall, .grid-2f-stairs-middle, .grid-2f-computer-desk-front, .grid-2f-computer-desk-nearby {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .grid-2f-first-light, .grid-2f-super-long-middle {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 480px) {
+            .grid-tin-house-wall, .grid-tin-house-wall-long, .grid-tin-house-desk2-long {
+                grid-template-columns: repeat(3, minmax(0, 1fr)); /* Three columns on very small screens */
+            }
+            .grid-he-desk, .grid-tin-house-outer-side, .grid-tin-house-outer-middle {
+                grid-template-columns: repeat(1, minmax(0, 1fr)); /* Single column on very small screens */
+            }
+             .grid-4f-small-room-inner, .grid-4f-partition-wall, .grid-4f-large-room-wall-edge-1, .grid-4f-large-room-wall-edge-2, .grid-4f-small-room-weave-1, .grid-4f-small-room-continue-2, .grid-4f-bottom-window-1, .grid-4f-bottom-window-2, .grid-4f-left-wall-1, .grid-4f-aluminum-door-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Two columns on very small screens */
+            }
+            /* 3F Adjustments for very small screens */
+            .grid-3f-stairs-red-show, .grid-3f-outer-area-row-1, .grid-3f-outer-area-row-2, .grid-3f-outer-area-row-3, .grid-3f-outer-area-row-4, .grid-3f-outer-area-row-5, .grid-3f-middle-road-cashbox {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+             .grid-3f-cabinet-super-long-top, .grid-3f-cabinet-super-long-middle, .grid-3f-cabinet-super-long-bottom, .grid-3f-sealing-table-right-area, .grid-3f-sealing-table-stone-area, .grid-3f-pulse-blood-type-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            /* 2F Adjustments for very small screens */
+            .grid-2f-sink-outside-wall-shelf, .grid-2f-toilet-exit-middle, .grid-2f-toilet-exit-stairs-side, .grid-2f-stairs-upper-wall, .grid-2f-stairs-middle, .grid-2f-computer-desk-front, .grid-2f-computer-desk-nearby {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+            .grid-2f-first-light, .grid-2f-super-long-middle {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Page specific styles */
+        .page {
+            display: none; /* Hidden by default */
+            width: 100%;
+        }
+        .page.active {
+            display: block; /* Show active page */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-6">多頁面應用程式</h1>
+
+        <!-- Navigation Bar -->
+        <nav class="mb-8 p-4 bg-gray-100 rounded-lg shadow-sm flex flex-wrap justify-center gap-4">
+            <button class="nav-button p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105" data-page="position-map-page">鐵皮屋位置相對圖</button>
+            <button class="nav-button p-3 bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105" data-page="other-page-1">4F</button>
+            <button class="nav-button p-3 bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105" data-page="third-floor-map-page">3F位置圖</button>
+            <button class="nav-button p-3 bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105" data-page="second-floor-map-page">2F位置圖</button>
+            <button class="nav-button p-3 bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105" data-page="other-page-2">其他頁面 2 (範例)</button>
+        </nav>
+
+        <!-- Page Content Area -->
+        <div id="app-content">
+            <!-- 鐵皮屋位置相對圖 Page -->
+            <div id="position-map-page" class="page active">
+                <h2 class="text-3xl font-semibold text-gray-700 mb-4 text-center">鐵皮屋位置相對圖</h2>
+                <div class="flex flex-col sm:flex-row gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner items-center justify-center">
+                    <input type="text" id="searchInput" placeholder="輸入代號 (例如: T55, A02)"
+                           class="flex-grow p-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg text-gray-700">
+                    <button id="searchButton"
+                            class="p-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        查詢代號
+                    </button>
+                </div>
+
+                <!-- New Order marking input and buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-8 p-4 bg-green-50 rounded-lg shadow-inner items-center justify-center">
+                    <input type="text" id="orderInput" placeholder="輸入訂單代號 (例如: T55,T67,T70)"
+                           class="flex-grow p-3 border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg text-gray-700">
+                    <button id="markOrderButton"
+                            class="p-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        標記訂單
+                    </button>
+                    <button id="clearAllButton"
+                            class="p-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                        清空所有標記
+                    </button>
+                </div>
+
+
+                <div id="messageBox" class="text-center text-lg font-medium text-red-600 mb-4 h-6"></div>
+
+                <!-- Map Display Area -->
+                <div id="mapContainer" class="p-6 border-2 border-gray-200 rounded-lg bg-gray-50">
+                    <!-- 何先生桌前 (Mr. He's Desk Front) -->
+                    <div class="mb-8">
+                        <h2 class="section-title">何先生桌前</h2>
+                        <div class="grid-he-desk">
+                            <!-- Adjusted for 4 rows x 3 columns layout based on user's image -->
+                            <div></div> <!-- Empty div for the first column's first row -->
+                            <div id="T55" class="code-item">T55</div>
+                            <div id="T64" class="code-item">T64</div>
+
+                            <div id="T54" class="code-item">T54</div>
+                            <div id="T57" class="code-item">T57</div>
+                            <div id="T62" class="code-item">T62</div>
+
+                            <div id="T58" class="code-item">T58</div>
+                            <div id="T61" class="code-item">T61</div>
+                            <div id="T67" class="code-item">T67</div>
+
+                            <div id="T56" class="code-item">T56</div>
+                            <div id="T63" class="code-item">T63</div>
+                            <div id="T66" class="code-item">T66</div>
+                        </div>
+                    </div>
+
+                    <!-- 鐵皮屋書桌靠牆開始算 (Tin House Desk Against Wall Start Counting) -->
+                    <div class="mb-8">
+                        <h2 class="section-title">鐵皮屋書桌靠牆開始算</h2>
+                        <div class="grid-tin-house-wall mb-2">
+                            <!-- Adjusted for T95 above T86 and T69 above T71 -->
+                            <div></div> <!-- col 1 -->
+                            <div></div> <!-- col 2 -->
+                            <div></div> <!-- col 3 -->
+                            <div></div> <!-- col 4 -->
+                            <div id="T95" class="code-item">T95</div> <!-- col 5 (above T86) -->
+                            <div></div> <!-- col 6 -->
+                            <div id="T69" class="code-item">T69</div> <!-- col 7 (above T71) -->
+                            <div></div> <!-- col 8 -->
+                        </div>
+                        <div class="grid-tin-house-wall-long mb-2">
+                            <div id="T75" class="code-item">T75</div>
+                            <div id="T94" class="code-item">T94</div>
+                            <div id="T59" class="code-item">T59</div>
+                            <div id="T90" class="code-item">T90</div>
+                            <div id="T86" class="code-item">T86</div>
+                            <div id="T70" class="code-item">T70</div>
+                            <div id="T71" class="code-item">T71</div>
+                        </div>
+                        <div class="grid-tin-house-wall-long mb-2">
+                            <div id="T68" class="code-item">T68</div>
+                            <div id="T85" class="code-item">T85</div>
+                            <div id="T60" class="code-item">T60</div>
+                            <div id="T96" class="code-item">T96</div>
+                            <div id="T89" class="code-item">T89</div>
+                            <div id="T84" class="code-item">T84</div>
+                            <div id="T72" class="code-item">T72</div>
+                            <div id="T79" class="code-item">T79</div>
+                        </div>
+                        <div class="grid-tin-house-wall-long mb-2">
+                            <div id="T65" class="code-item">T65</div>
+                            <div id="T93" class="code-item">T93</div>
+                            <div id="T81" class="code-item">T81</div>
+                            <div id="T91" class="code-item">T91</div>
+                            <div id="T88" class="code-item">T88</div>
+                            <div id="T82" class="code-item">T82</div>
+                            <div id="T74" class="code-item">T74</div>
+                            <div id="T78" class="code-item">T78</div>
+                        </div>
+                        <div class="grid-tin-house-wall-long">
+                            <div id="T46" class="code-item">T46</div>
+                            <div id="T76" class="code-item">T76</div>
+                            <div id="T80" class="code-item">T80</div>
+                            <div id="T92" class="code-item">T92</div>
+                            <div id="T87" class="code-item">T87</div>
+                            <div id="T83" class="code-item">T83</div>
+                            <div id="T73" class="code-item">T73</div>
+                            <div id="T77" class="code-item">T77</div>
+                        </div>
+                    </div>
+
+                    <!-- 鐵皮屋書桌外三條 (Tin House Desk Outer Three Rows) -->
+                    <div class="mb-8 flex flex-col sm:flex-row gap-8">
+                        <!-- 外邊 (Outside) -->
+                        <div class="sm:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-4">外邊</h3>
+                            <div class="flex flex-col gap-2">
+                                <div id="A05" class="code-item">A05</div>
+                                <div id="A04" class="code-item">A04</div>
+                                <div class="grid-tin-house-outer-side mb-2">
+                                    <div id="A02" class="code-item">A02</div>
+                                    <div id="A06" class="code-item">A06</div>
+                                </div>
+                                <div class="grid-tin-house-outer-side">
+                                    <div id="A03" class="code-item">A03</div>
+                                    <div id="A07" class="code-item">A07</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 中間 (Middle) -->
+                        <div class="sm:w-1/2">
+                            <h3 class="text-xl font-semibold text-gray-700 mb-4">中間</h3>
+                            <div class="flex flex-col gap-2">
+                                 <div id="T101" class="code-item">T101</div>
+                                <div class="grid-tin-house-outer-side mb-2">
+                                    <div id="T97" class="code-item">T97</div>
+                                    <div id="T103" class="code-item">T103</div>
+                                </div>
+                                <div class="grid-tin-house-outer-side mb-2">
+                                    <div id="T98" class="code-item">T98</div>
+                                    <div id="T100" class="code-item">T100</div>
+                                </div>
+                                <div class="grid-tin-house-outer-side">
+                                    <div id="T99" class="code-item">T99</div>
+                                    <div id="T102" class="code-item">T102</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 鐵皮屋書桌2底牆開始 (Tin House Desk 2 Bottom Wall Start) -->
+                    <div class="mb-8">
+                        <h2 class="section-title">鐵皮屋書桌2底牆開始</h2>
+                        <div class="grid-tin-house-desk2-top mb-2">
+                            <div class="col-start-2" id="T49" class="code-item">T49</div>
+                            <div id="T48" class="code-item">T48</div>
+                            <div id="T51" class="code-item">T51</div>
+                        </div>
+                        <div class="grid-tin-house-desk2-long mb-2">
+                            <div id="T36" class="code-item">T36</div>
+                            <div id="T47" class="code-item">T47</div>
+                            <div id="T50" class="code-item">T50</div>
+                            <div id="T44" class="code-item">T44</div>
+                            <div id="T13" class="code-item">T13</div>
+                            <div id="T15" class="code-item">T15</div>
+                            <div id="T52" class="code-item">T52</div>
+                            <div id="T53" class="code-item">T53</div>
+                        </div>
+                        <div id="T39" class="grid-tin-house-desk2-long mb-2">
+                            <div id="T39" class="code-item">T39</div>
+                            <div id="T45" class="code-item">T45</div>
+                            <div id="T35" class="code-item">T35</div>
+                            <div id="T43" class="code-item">T43</div>
+                            <div id="T26" class="code-item">T26</div>
+                            <div id="T14" class="code-item">T14</div>
+                            <div id="T01" class="code-item">T01</div>
+                            <div id="T22" class="code-item">T22</div>
+                        </div>
+                        <div class="grid-tin-house-desk2-long mb-2">
+                            <div id="T37" class="code-item">T37</div>
+                            <div id="T11" class="code-item">T11</div>
+                            <div id="T34" class="code-item">T34</div>
+                            <div id="T42" class="code-item">T42</div>
+                            <div id="T29" class="code-item">T29</div>
+                            <div id="T16" class="code-item">T16</div>
+                            <div id="T02" class="code-item">T02</div>
+                            <div id="T07" class="code-item">T07</div>
+                        </div>
+                        <div class="grid-tin-house-desk2-long mb-2">
+                            <div id="T31" class="code-item">T31</div>
+                            <div id="T12" class="code-item">T12</div>
+                            <div id="T40" class="code-item">T40</div>
+                            <div id="T41" class="code-item">T41</div>
+                            <div id="T28" class="code-item">T28</div>
+                            <div id="T17" class="code-item">T17</div>
+                            <div id="T09" class="code-item">T09</div>
+                            <div id="T04" class="code-item">T04</div>
+                        </div>
+                        <div class="grid-tin-house-desk2-long">
+                            <div id="T30" class="code-item">T30</div>
+                            <div id="T10" class="code-item">T10</div>
+                            <div id="T38" class="code-item">T38</div>
+                            <div id="T06" class="code-item">T06</div>
+                            <div id="T27" class="code-item">T27</div>
+                            <div id="T18" class="code-item">T18</div>
+                            <div id="T03" class="code-item">T03</div>
+                            <div id="T08" class="code-item">T08</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4F Page Content -->
+            <div id="other-page-1" class="page">
+                <h2 class="text-3xl font-semibold text-gray-700 mb-4 text-center">4F</h2>
+                <button class="back-to-search-button p-2 mb-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg shadow-sm transition-all duration-300 ease-in-out">回到查詢</button>
+                <div id="map4FContainer" class="p-6 border-2 border-gray-200 rounded-lg bg-gray-50">
+                    <!-- 4F 小間 內 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4F 小間 內</h3>
+                        <div class="grid-4f-small-room-inner">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="250126" class="code-item">250126</div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="250127" class="code-item">250127</div>
+                            <div id="250313" class="code-item">250313</div>
+                            <div id="250210" class="code-item">250210</div>
+                            <div></div>
+
+                            <div id="250203" class="code-item">250203</div>
+                            <div></div>
+                            <div id="250119" class="code-item">250119</div>
+                            <div id="250130" class="code-item">250130</div>
+                            <div id="250205" class="code-item">250205</div>
+                            <div id="250309" class="code-item">250309</div>
+
+                            <div id="250120" class="code-item">250120</div>
+                            <div id="250122" class="code-item">250122</div>
+                            <div id="250410" class="code-item">250410</div>
+                            <div id="250208" class="code-item">250208</div>
+                            <div id="250209" class="code-item">250209</div>
+                            <div id="250201" class="code-item">250201</div>
+                        </div>
+                    </div>
+
+                    <!-- 4F 小間 為隔牆 - 2 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4F 小間 為隔牆 - 2</h3>
+                        <div class="grid-4f-partition-wall">
+                            <div></div>
+                            <div></div>
+                            <div id="250325" class="code-item">250325</div>
+                            <div></div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="250324" class="code-item">250324</div>
+                            <div></div>
+                            <div></div>
+
+                            <div id="250311" class="code-item">250311</div>
+                            <div id="250112" class="code-item">250112</div>
+                            <div id="250125" class="code-item">250125</div>
+                            <div id="250414-1" class="code-item">250414-1</div>
+                            <div id="250320" class="code-item">250320</div>
+
+                            <div id="250128" class="code-item">250128</div>
+                            <div id="250109" class="code-item">250109</div>
+                            <div id="250111" class="code-item">250111</div>
+                            <div id="250202" class="code-item">250202</div>
+                            <div id="250322" class="code-item">250322</div>
+
+                            <div id="250129" class="code-item">250129</div>
+                            <div id="250114" class="code-item">250114</div>
+                            <div id="250204" class="code-item">250204</div>
+                            <div id="250226" class="code-item">250226</div>
+                            <div id="250124" class="code-item">250124</div>
+                        </div>
+                    </div>
+
+                    <!-- 4F 大間 牆邊 - 1 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4F 大間 牆邊 - 1</h3>
+                        <div class="grid-4f-large-room-wall-edge-1">
+                            <div></div>
+                            <div></div>
+                            <div id="250331" class="code-item">250331</div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="250318" class="code-item">250318</div>
+                            <div></div>
+
+                            <div id="250212" class="code-item">250212</div>
+                            <div></div>
+                            <div></div>
+                            <div id="250327" class="code-item">250327</div>
+
+                            <div id="250312" class="code-item">250312</div>
+                            <div id="250415" class="code-item">250415</div>
+                            <div id="250414-2" class="code-item">250414-2</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 4F 大間 靠牆邊 - 2 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4F 大間 靠牆邊 - 2</h3>
+                        <div class="grid-4f-large-room-wall-edge-2">
+                            <div></div>
+                            <div id="250218" class="code-item">250218</div>
+                            <div></div>
+
+                            <div id="250416" class="code-item">250416</div>
+                            <div id="250214" class="code-item">250214</div>
+                            <div></div>
+
+                            <div id="250406" class="code-item">250406</div>
+                            <div id="250211" class="code-item">250211</div>
+                            <div></div>
+
+                            <div id="250215" class="code-item">250215</div>
+                            <div id="250221" class="code-item">250221</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 4f 小間 編一 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4f 小間 編一</h3>
+                        <div class="grid-4f-small-room-weave-1">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="240325" class="code-item">240325</div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="240403" class="code-item">240403</div>
+                            <div></div>
+                            <div id="240421" class="code-item">240421</div>
+
+                            <div id="240326" class="code-item">240326</div>
+                            <div></div>
+                            <div id="240319" class="code-item">240319</div>
+                            <div id="240410" class="code-item">240410</div>
+                            <div id="240321" class="code-item">240321</div>
+                            <div id="240311" class="code-item">240311</div>
+                        </div>
+                    </div>
+
+                    <!-- 4f 小間 續二 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4f 小間 續二</h3>
+                        <div class="grid-4f-small-room-continue-2">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="240420" class="code-item">240420</div>
+                            <div id="240414" class="code-item">240414</div>
+
+                            <div></div>
+                            <div id="240409" class="code-item">240409</div>
+                            <div id="240425" class="code-item">240425</div>
+                            <div id="240423" class="code-item">240423</div>
+                            <div id="240418" class="code-item">240418</div>
+                            <div id="240318" class="code-item">240318</div>
+
+                            <div id="240411" class="code-item">240411</div>
+                            <div id="240405" class="code-item">240405</div>
+                            <div id="240408" class="code-item">240408</div>
+                            <div id="240407" class="code-item">240407</div>
+                            <div id="240322" class="code-item">240322</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 4f 底窗 之 一 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4f 底窗 之 一</h3>
+                        <div class="grid-4f-bottom-window-1">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230414" class="code-item">230414</div>
+
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230606" class="code-item">230606</div>
+                            <div id="230604-2" class="code-item">230604-2</div>
+                            <div id="2304413-2" class="code-item">2304413-2</div>
+                            <div id="240119" class="code-item">240119</div>
+                            <div></div>
+
+                            <div id="230813" class="code-item">230813</div>
+                            <div id="230715" class="code-item">230715</div>
+                            <div id="230608" class="code-item">230608</div>
+                            <div id="230604-3" class="code-item">230604-3</div>
+                            <div id="230424" class="code-item">230424</div>
+                            <div id="240110" class="code-item">240110</div>
+                            <div id="240115-2" class="code-item">240115-2</div>
+                            <div></div>
+
+                            <div id="230812" class="code-item">230812</div>
+                            <div id="230623" class="code-item">230623</div>
+                            <div id="230609" class="code-item">230609</div>
+                            <div id="230604-1" class="code-item">230604-1</div>
+                            <div id="230423" class="code-item">230423</div>
+                            <div id="240116" class="code-item">240116</div>
+                            <div id="240115" class="code-item">240115</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 4F 底窗 之 二 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4F 底窗 之 二</h3>
+                        <div class="grid-4f-bottom-window-2">
+                            <div></div>
+                            <div></div>
+                            <div id="230630" class="code-item">230630</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+
+                            <div id="230619" class="code-item">230619</div>
+                            <div id="230511" class="code-item">230511</div>
+                            <div id="230513" class="code-item">230513</div>
+                            <div id="230511-2" class="code-item">230511-2</div>
+                            <div id="230521" class="code-item">230521</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+
+                            <div id="230701" class="code-item">230701</div>
+                            <div id="230616" class="code-item">230616</div>
+                            <div id="230530" class="code-item">230530</div>
+                            <div id="230502" class="code-item">230502</div>
+                            <div id="230412" class="code-item">230412</div>
+                            <div id="230601" class="code-item">230601</div>
+                            <div id="240120" class="code-item">240120</div>
+                            <div></div>
+
+                            <div id="230706" class="code-item">230706</div>
+                            <div id="230622" class="code-item">230622</div>
+                            <div id="230531" class="code-item">230531</div>
+                            <div id="230505" class="code-item">230505</div>
+                            <div id="230421" class="code-item">230421</div>
+                            <div id="230418-2" class="code-item">230418-2</div>
+                            <div id="240117" class="code-item">240117</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 4f 左牆 之 一 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">4f 左牆 之 一</h3>
+                        <div class="grid-4f-left-wall-1">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="241004-1" class="code-item">241004-1</div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="240606-1" class="code-item">240606-1</div>
+                            <div id="240528" class="code-item">240528</div>
+                            <div></div>
+                            <div></div>
+                            <div id="240228" class="code-item">240228</div>
+                            <div></div>
+                            <div id="241001" class="code-item">241001</div>
+                            <div id="241004-1-duplicate" class="code-item">241004-1</div>
+
+                            <div id="240720" class="code-item">240720</div>
+                            <div id="240809" class="code-item">240809</div>
+                            <div id="240606-3" class="code-item">240606-3</div>
+                            <div id="240604" class="code-item">240604</div>
+                            <div id="240512" class="code-item">240512</div>
+                            <div id="240128" class="code-item">240128</div>
+                            <div id="240219-1" class="code-item">240219-1</div>
+                            <div id="240210-ab" class="code-item">240210 ab</div>
+                            <div id="241003" class="code-item">241003</div>
+                            <div id="241004-2" class="code-item">241004-2</div>
+                            <div></div>
+
+                            <div id="240524" class="code-item">240524</div>
+                            <div id="240527" class="code-item">240527</div>
+                            <div id="240606-2" class="code-item">240606-2</div>
+                            <div id="240610" class="code-item">240610</div>
+                            <div id="240707" class="code-item">240707</div>
+                            <div id="240123" class="code-item">240123</div>
+                            <div id="240209" class="code-item">240209</div>
+                            <div id="240219-2" class="code-item">240219-2</div>
+                            <div id="240210" class="code-item">240210</div>
+                            <div id="241006" class="code-item">241006</div>
+                            <div id="240927" class="code-item">240927</div>
+                        </div>
+                    </div>
+
+                    <!-- 鋁門 第二 排 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">鋁門 第二 排</h3>
+                        <div class="grid-4f-aluminum-door-2">
+                            <div></div>
+                            <div id="240930" class="code-item">240930</div>
+                            <div id="241004-2-duplicate" class="code-item">241004-2</div>
+                            <div></div>
+                            <div></div>
+                            <div id="240816" class="code-item">240816</div>
+                            <div></div>
+                            <div id="240806" class="code-item">240806</div>
+                            <div></div>
+                            <div id="240819" class="code-item">240819</div>
+
+                            <div id="240917" class="code-item">240917</div>
+                            <div id="241005" class="code-item">241005</div>
+                            <div id="240510" class="code-item">240510</div>
+                            <div></div>
+                            <div id="240823" class="code-item">240823</div>
+                            <div id="240902" class="code-item">240902</div>
+                            <div id="240805" class="code-item">240805</div>
+                            <div id="240711" class="code-item">240711</div>
+                            <div id="240721" class="code-item">240721</div>
+                            <div></div>
+
+                            <div id="240903" class="code-item">240903</div>
+                            <div id="240926" class="code-item">240926</div>
+                            <div id="240204" class="code-item">240204</div>
+                            <div id="240207" class="code-item">240207</div>
+                            <div id="240129" class="code-item">240129</div>
+                            <div id="240807" class="code-item">240807</div>
+                            <div id="240802" class="code-item">240802</div>
+                            <div id="240804" class="code-item">240804</div>
+                            <div id="240529" class="code-item">240529</div>
+                            <div id="240516" class="code-item">240516</div>
+
+                            <div id="240928" class="code-item">240928</div>
+                            <div id="240929" class="code-item">240929</div>
+                            <div id="240226" class="code-item">240226</div>
+                            <div id="240208" class="code-item">240208</div>
+                            <div id="240224" class="code-item">240224</div>
+                            <div id="240802-duplicate" class="code-item">240802</div>
+                            <div id="240901" class="code-item">240901</div>
+                            <div id="240810" class="code-item">240810</div>
+                            <div id="240817" class="code-item">240817</div>
+                            <div id="240511" class="code-item">240511</div>
+                            <div id="240515" class="code-item">240515</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3F位置圖 Page Content -->
+            <div id="third-floor-map-page" class="page">
+                <h2 class="text-3xl font-semibold text-gray-700 mb-4 text-center">3F位置圖</h2>
+                <button class="back-to-search-button p-2 mb-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg shadow-sm transition-all duration-300 ease-in-out">回到查詢</button>
+                <div id="map3FContainer" class="p-6 border-2 border-gray-200 rounded-lg bg-gray-50">
+                    <!-- 3 樓梯 上級 紅秀 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3 樓梯 上級 紅秀</h3>
+                        <div class="grid-3f-stairs-red-show">
+                            <div id="241201" class="code-item">241201</div>
+                            <div></div>
+                            <div></div>
+                            <div id="241120" class="code-item">241120</div>
+                            <div></div>
+                            <div id="220919" class="code-item">220919</div>
+                            <div id="220701" class="code-item">220701</div>
+                            <div id="220609" class="code-item">220609</div>
+
+                            <div id="241122" class="code-item">241122</div>
+                            <div></div>
+                            <div></div>
+                            <div id="241121" class="code-item">241121</div>
+                            <div></div>
+                            <div id="220912" class="code-item">220912</div>
+                            <div id="220721" class="code-item">220721</div>
+                            <div id="220708" class="code-item">220708</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220603" class="code-item">220603</div>
+
+                            <div id="241116" class="code-item">241116</div>
+                            <div></div>
+                            <div></div>
+                            <div id="241016" class="code-item">241016</div>
+                            <div></div>
+                            <div id="220905" class="code-item">220905</div>
+                            <div id="220625" class="code-item">220625</div>
+                            <div id="220620" class="code-item">220620</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220617" class="code-item">220617</div>
+
+                            <div id="241106" class="code-item">241106</div>
+                            <div></div>
+                            <div id="241028" class="code-item">241028</div>
+                            <div></div> <!-- For 報紙 placeholder -->
+                            <div></div>
+                            <div id="220825" class="code-item">220825</div>
+                            <div id="220623" class="code-item">220623</div>
+                            <div id="220606" class="code-item">220606</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220613" class="code-item">220613</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">3</h3>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220630" class="code-item">220630</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220624" class="code-item">220624</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-2">
+                            <div id="220607" class="code-item">220607</div>
+                            <div id="220622" class="code-item">220622</div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220608" class="code-item">220608</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220629" class="code-item">220629</div>
+                        </div>
+                    </div>
+
+                    <!-- 3F 底函 通櫃正 前 超長 & 3F 第三 週 售櫃 前 超長 -->
+                    <div class="mb-8 flex flex-col lg:flex-row gap-8">
+                        <div class="lg:w-1/2">
+                            <h3 class="section-title">3F 底函 通櫃正 前 超長</h3>
+                            <div class="grid-3f-cabinet-super-long-top mb-2">
+                                <div></div>
+                                <div id="211128-2" class="code-item">211128-2</div>
+                                <div></div>
+                                <div></div>
+                                <div id="211222" class="code-item">211222</div>
+                                <div></div>
+                                <div id="211226" class="code-item">211226</div>
+                                <div id="211209" class="code-item">211209</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-top mb-2">
+                                <div></div>
+                                <div id="211228-1" class="code-item">211228-1</div>
+                                <div></div>
+                                <div></div>
+                                <div id="211025" class="code-item">211025</div>
+                                <div></div>
+                                <div id="211231" class="code-item">211231</div>
+                                <div id="211022" class="code-item">211022</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-middle mb-2">
+                                <div id="211127" class="code-item">211127</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="211219" class="code-item">211219</div>
+                                <div id="211221" class="code-item">211221</div>
+                                <div id="211023" class="code-item">211023</div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-top mb-2">
+                                <div id="211223" class="code-item">211223</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="211218" class="code-item">211218</div>
+                                <div></div>
+                                <div id="211225" class="code-item">211225</div>
+                                <div id="211024" class="code-item">211024</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-top mb-2">
+                                <div id="211222-C" class="code-item">211222 C</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="211230" class="code-item">211230</div>
+                                <div></div>
+                                <div id="211229" class="code-item">211229</div>
+                                <div id="211006-x" class="code-item">211006 x</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </div>
+
+                        <div class="lg:w-1/2">
+                            <h3 class="section-title">3F 第三 週 售櫃 前 超長</h3>
+                            <div class="grid-3f-cabinet-super-long-top mb-2">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="220520" class="code-item">220520</div>
+                                <div></div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-bottom mb-2">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="220503-2" class="code-item">220503-2</div>
+                                <div id="220501" class="code-item">220501</div>
+                                <div></div>
+                                <div id="220524" class="code-item">220524</div>
+                                <div id="220730" class="code-item">220730</div>
+                                <div id="220805-2" class="code-item">220805-2</div>
+                                <div id="220815" class="code-item">220815</div>
+                                <div id="220820" class="code-item">220820</div>
+                                <div id="220720" class="code-item">220720</div>
+                                <div id="220913" class="code-item">220913</div>
+                                <div id="221011" class="code-item">221011</div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-bottom mb-2">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="220508" class="code-item">220508</div>
+                                <div id="220503-1" class="code-item">220503-1</div>
+                                <div id="220525" class="code-item">220525</div>
+                                <div id="220509" class="code-item">220509</div>
+                                <div id="220502" class="code-item">220502</div>
+                                <div id="2205130" class="code-item">2205130</div>
+                                <div id="220511" class="code-item">220511</div>
+                                <div id="220707" class="code-item">220707</div>
+                                <div id="220805-1" class="code-item">220805-1</div>
+                                <div id="220814" class="code-item">220814</div>
+                                <div id="22052" class="code-item">22052</div>
+                                <div id="220910" class="code-item">220910</div>
+                                <div id="220921" class="code-item">220921</div>
+                                <div id="220922" class="code-item">220922</div>
+                                <div id="221023" class="code-item">221023</div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-bottom mb-2">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="220508-2" class="code-item">220508-2</div>
+                                <div id="220503-3" class="code-item">220503-3</div>
+                                <div id="220526" class="code-item">220526</div>
+                                <div id="220518" class="code-item">220518</div>
+                                <div id="220523" class="code-item">220523</div>
+                                <div></div>
+                                <div id="220516" class="code-item">220516</div>
+                                <div id="220706" class="code-item">220706</div>
+                                <div id="220710" class="code-item">220710</div>
+                                <div></div>
+                                <div id="220731" class="code-item">220731</div>
+                                <div id="220802" class="code-item">220802</div>
+                                <div></div>
+                                <div id="220809" class="code-item">220809</div>
+                                <div id="220903" class="code-item">220903</div>
+                                <div id="220924" class="code-item">220924</div>
+                                <div id="220904" class="code-item">220904</div>
+                                <div id="220911" class="code-item">220911</div>
+                            </div>
+                            <div class="grid-3f-cabinet-super-long-bottom mb-2">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div id="220508-3" class="code-item">220508-3</div>
+                                <div id="220514" class="code-item">220514</div>
+                                <div id="220522" class="code-item">220522</div>
+                                <div id="220515" class="code-item">220515</div>
+                                <div id="220512" class="code-item">220512</div>
+                                <div id="220510" class="code-item">220510</div>
+                                <div id="220507" class="code-item">220507</div>
+                                <div id="220506" class="code-item">220506</div>
+                                <div></div>
+                                <div></div>
+                                <div id="220717" class="code-item">220717</div>
+                                <div id="220718" class="code-item">220718</div>
+                                <div></div>
+                                <div id="220726" class="code-item">220726</div>
+                                <div id="220719" class="code-item">220719</div>
+                                <div id="220729" class="code-item">220729</div>
+                                <div id="220811" class="code-item">220811</div>
+                                <div id="220818" class="code-item">220818</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">3 外</h3>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="221101" class="code-item">221101</div>
+                            <div></div>
+                            <div></div>
+                            <div id="241129" class="code-item">241129</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="221004" class="code-item">221004</div>
+                            <div id="221129-duplicate" class="code-item">221129</div>
+                            <div></div>
+                            <div id="221102" class="code-item">221102</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="221008" class="code-item">221008</div>
+                            <div id="221021" class="code-item">221021</div>
+                            <div></div>
+                            <div id="221106" class="code-item">221106</div>
+                        </div>
+                    </div>
+
+                    <!-- 3f 廁外 區 第一 排 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3f 廁外 區 第一 排</h3>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="221124" class="code-item">221124</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <!-- 31 期 外蓋 第二 排 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">31 期 外蓋 第二 排</h3>
+                        <div class="grid-3f-outer-area-row-3">
+                            <div id="221006-outer" class="code-item">221006</div>
+                            <div></div>
+                            <div id="241017" class="code-item">241017</div>
+                            <div id="241024" class="code-item">241024</div>
+                        </div>
+                    </div>
+                     <!-- 3f 廁外 區 第三 擇 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3f 廁外 區 第三 擇</h3>
+                        <div class="grid-3f-outer-area-row-3">
+                            <div></div>
+                            <div></div>
+                            <div id="241002" class="code-item">241002</div>
+                            <div id="241125" class="code-item">241125</div>
+
+                            <div id="221207" class="code-item">221207</div>
+                            <div id="221229" class="code-item">221229</div>
+                            <div></div>
+                            <div id="221223" class="code-item">221223</div>
+                            <div id="241118" class="code-item">241118</div>
+
+                            <div id="221123" class="code-item">221123</div>
+                            <div id="221202" class="code-item">221202</div>
+                            <div></div>
+                            <div id="221215" class="code-item">221215</div>
+                            <div id="241102-duplicate" class="code-item">241102</div>
+                        </div>
+                    </div>
+                    <!-- 3 廁外 監單 四 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3 廁外 監單 四</h3>
+                        <div class="grid-3f-outer-area-row-4">
+                            <div></div>
+                            <div id="241115" class="code-item">241115</div>
+
+                            <div id="221230" class="code-item">221230</div>
+                            <div id="241214" class="code-item">241214</div>
+
+                            <div id="221130" class="code-item">221130</div>
+                            <div id="241127" class="code-item">241127</div>
+                        </div>
+                    </div>
+                    <!-- f 廁外 區 第五 排 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">f 廁外 區 第五 排</h3>
+                        <div class="grid-3f-outer-area-row-5">
+                            <div></div>
+                            <div></div>
+                            <div id="221220" class="code-item">221220</div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="221222-outside" class="code-item">221222</div>
+                            <div id="241011" class="code-item">241011</div>
+
+                            <div id="221127-outside" class="code-item">221127</div>
+                            <div id="221121-outside" class="code-item">221121</div>
+                            <div id="221018" class="code-item">221018</div>
+                            <div id="241207" class="code-item">241207</div>
+
+                            <div id="221128-outside" class="code-item">221128</div>
+                            <div id="221219-outside" class="code-item">221219</div>
+                            <div id="221218-outside" class="code-item">221218</div>
+                            <div id="241130" class="code-item">241130</div>
+                        </div>
+                    </div>
+
+                    <!-- 3f 封箱 桌 右 區 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3f 封箱 桌 右 區</h3>
+                        <div class="grid-3f-sealing-table-right-area">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="220204" class="code-item">220204</div>
+                            <div></div>
+                            <div id="220214" class="code-item">220214</div>
+
+                            <div id="220225" class="code-item">220225</div>
+                            <div id="220205-2" class="code-item">220205-2</div>
+                            <div id="220203" class="code-item">220203</div>
+                            <div id="220207" class="code-item">220207</div>
+                            <div id="220216" class="code-item">220216</div>
+                            <div id="220215" class="code-item">220215</div>
+                            <div id="220206" class="code-item">220206</div>
+                            <div id="220201" class="code-item">220201</div>
+                            <div id="221217" class="code-item">221217</div>
+
+                            <div id="220125-table" class="code-item">220125</div>
+                            <div id="220124-table" class="code-item">220124</div>
+                            <div id="220213" class="code-item">220213</div>
+                            <div id="220223" class="code-item">220223</div>
+                            <div id="220222" class="code-item">220222</div>
+                            <div id="220220" class="code-item">220220</div>
+                            <div></div>
+                            <div id="220221" class="code-item">220221</div>
+                            <div id="220212" class="code-item">220212</div>
+                            <div id="221216" class="code-item">221216</div>
+                        </div>
+                    </div>
+
+                    <!-- 3f 封箱桌石 區 二 街 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3f 封箱桌石 區 二 街</h3>
+                        <div class="grid-3f-sealing-table-stone-area">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="220122-table" class="code-item">220122</div>
+                            <div></div>
+                            <div id="220119" class="code-item">220119</div>
+                            <div></div>
+                            <div id="220118" class="code-item">220118</div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="220105" class="code-item">220105</div>
+                            <div id="220108" class="code-item">220108</div>
+                            <div id="220109" class="code-item">220109</div>
+                            <div id="220117" class="code-item">220117</div>
+                            <div id="220121" class="code-item">220121</div>
+                            <div></div>
+
+                            <div id="220205-1" class="code-item">220205-1</div>
+                            <div id="220106" class="code-item">220106</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220112" class="code-item">220112</div>
+                            <div id="220101" class="code-item">220101</div>
+                            <div id="220114" class="code-item">220114</div>
+                            <div id="220128-table" class="code-item">220128</div>
+                            <div></div>
+                            <div id="220130-table" class="code-item">220130</div>
+
+                            <div id="220110-table" class="code-item">220110</div>
+                            <div id="220129-table" class="code-item">220129</div>
+                            <div id="220111-table" class="code-item">220111</div>
+                            <div id="220104" class="code-item">220104</div>
+                            <div id="220115" class="code-item">220115</div>
+                            <div id="220113" class="code-item">220113</div>
+                            <div></div>
+                            <div id="220128-table-duplicate" class="code-item">220128</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">3</h3> <!-- This '3' section appears as a new block, likely a typo for a full section title -->
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220317" class="code-item">220317</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="220330" class="code-item">220330</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220316" class="code-item">220316</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220312" class="code-item">220312</div>
+                            <div></div>
+                            <div id="220331" class="code-item">220331</div>
+                            <div id="220327-duplicate" class="code-item">220327</div>
+                            <div></div>
+                            <div id="220428-2" class="code-item">220428-2</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220309" class="code-item">220309</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220320" class="code-item">220320</div>
+                            <div></div>
+                            <div id="220325" class="code-item">220325</div>
+                            <div id="220328" class="code-item">220328</div>
+                            <div id="220428-3" class="code-item">220428-3</div>
+                            <div id="220415" class="code-item">220415</div>
+                        </div>
+                        <div class="grid-3f-outer-area-row-1">
+                            <div id="220315-duplicate" class="code-item">220315</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220324-duplicate" class="code-item">220324</div>
+                            <div id="220303" class="code-item">220303</div>
+                            <div id="220329" class="code-item">220329</div>
+                            <div id="220306" class="code-item">220306</div>
+                            <div id="220301" class="code-item">220301</div>
+                        </div>
+                    </div>
+
+                    <!-- 3f 脉血 種 之 二 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3f 脉血 種 之 二</h3>
+                        <div class="grid-3f-pulse-blood-type-2">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="220409-2" class="code-item">220409-2</div>
+                            <div id="220419" class="code-item">220419</div>
+                            <div></div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="220410-2" class="code-item">220410-2</div>
+                            <div id="220409-1" class="code-item">220409-1</div>
+                            <div id="220424-duplicate" class="code-item">220424</div>
+                            <div id="220425-duplicate" class="code-item">220425</div>
+
+                            <div id="220302-BC" class="code-item">220302 BC</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220410-1" class="code-item">220410-1</div>
+                            <div id="220408" class="code-item">220408</div>
+                            <div id="220308" class="code-item">220308</div>
+                            <div id="220412-duplicate" class="code-item">220412</div>
+
+                            <div id="220401" class="code-item">220401</div>
+                            <div></div>
+                            <div></div>
+                            <div id="220405" class="code-item">220405</div>
+                            <div id="220420" class="code-item">220420</div>
+                            <div id="220422" class="code-item">220422</div>
+                            <div id="220402" class="code-item">220402</div>
+
+                            <div id="220428-1" class="code-item">220428-1</div>
+                        </div>
+                    </div>
+
+                    <!-- 3F 中路 正 2 個 錢櫃 中 封箱 應 後 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">3F 中路 正 2 個 錢櫃 中 封箱 應 後</h3>
+                        <div class="grid-3f-middle-road-cashbox">
+                            <div id="2204230" class="code-item">2204230</div>
+                            <div></div>
+
+                            <div id="220403" class="code-item">220403</div>
+                            <div id="220418" class="code-item">220418</div>
+
+                            <div id="220302-CC" class="code-item">220302 CC</div>
+                            <div id="220421-duplicate" class="code-item">220421</div>
+
+                            <div id="220302-AC" class="code-item">220302 AC</div>
+                            <div id="220404" class="code-item">220404</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2F位置圖 Page Content -->
+            <div id="second-floor-map-page" class="page">
+                <h2 class="text-3xl font-semibold text-gray-700 mb-4 text-center">2F位置圖</h2>
+                <button class="back-to-search-button p-2 mb-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg shadow-sm transition-all duration-300 ease-in-out">回到查詢</button>
+                <div id="map2FContainer" class="p-6 border-2 border-gray-200 rounded-lg bg-gray-50">
+                    <!-- 2F 洗手 台 外面 牆 邊架 上 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">2F 洗手 台 外面 牆 邊架 上</h3>
+                        <div class="grid-2f-sink-outside-wall-shelf">
+                            <div></div>
+                            <div></div>
+                            <div id="230727" class="code-item">230727</div>
+                            <div></div>
+                            <div id="231022" class="code-item">231022</div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="200915" class="code-item">200915</div>
+                            <div></div>
+                            <div id="230720" class="code-item">230720</div>
+                            <div id="230818" class="code-item">230818</div>
+
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="231003" class="code-item">231003</div>
+                            <div id="231001" class="code-item">231001</div>
+                            <div id="231021" class="code-item">231021</div>
+
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230807" class="code-item">230807</div>
+                            <div id="231002" class="code-item">231002</div>
+                            <div id="230730" class="code-item">230730</div>
+                        </div>
+                    </div>
+
+                    <!-- 2F 廁所 出 中間 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">2F 廁所 出 中間</h3>
+                        <div class="grid-2f-toilet-exit-middle">
+                            <div></div>
+                            <div></div>
+                            <div id="230805" class="code-item">230805</div>
+                            <div id="230804" class="code-item">230804</div>
+
+                            <div></div>
+                            <div id="231004" class="code-item">231004</div>
+                            <div></div>
+                            <div id="231007" class="code-item">231007</div>
+                            <div></div>
+                            <div id="241211" class="code-item">241211</div>
+
+                            <div></div>
+                            <div id="231005" class="code-item">231005</div>
+                            <div></div>
+                            <div id="230808" class="code-item">230808</div>
+                            <div id="230712" class="code-item">230712</div>
+                            <div></div>
+
+                            <div></div>
+                            <div id="231006" class="code-item">231006</div>
+                            <div></div>
+                            <div id="220716" class="code-item">220716</div>
+                            <div id="230713" class="code-item">230713</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <!-- 2F 廁所 出 樓梯 邊 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">2F 廁所 出 樓梯 邊</h3>
+                        <div class="grid-2f-toilet-exit-stairs-side">
+                            <div id="231109" class="code-item">231109</div>
+                            <div></div>
+                            <div id="231214" class="code-item">231214</div>
+
+                            <div id="231126" class="code-item">231126</div>
+                            <div id="231111" class="code-item">231111</div>
+                            <div id="231206" class="code-item">231206</div>
+
+                            <div id="231112" class="code-item">231112</div>
+                            <div id="231110" class="code-item">231110</div>
+                            <div id="231202" class="code-item">231202</div>
+                        </div>
+                    </div>
+
+                    <!-- 2F 樓梯 上 牆 還 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">2F 樓梯 上 牆 還</h3>
+                        <div class="grid-2f-stairs-upper-wall">
+                            <div></div>
+                            <div></div>
+                            <div id="230806" class="code-item">230806</div>
+
+                            <div></div>
+                            <div></div>
+                            <div id="230903" class="code-item">230903</div>
+                            <div id="230730-1" class="code-item">230730-1</div>
+
+                            <div id="241213" class="code-item">241213</div>
+                            <div id="230729-2" class="code-item">230729-2</div>
+                            <div id="230730-2" class="code-item">230730-2</div>
+
+                            <div id="241128" class="code-item">241128</div>
+                            <div id="230729-1-X" class="code-item">230729-1 X</div>
+                        </div>
+                    </div>
+
+                    <!-- 2F 樓梯 中 -->
+                    <div class="mb-8">
+                        <h3 class="section-title">2F 樓梯 中</h3>
+                        <div class="grid-2f-stairs-middle">
+                            <div id="241212" class="code-item">241212</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+
+                            <div id="241202" class="code-item">241202</div>
+                            <div id="231024-1" class="code-item">231024-1</div>
+                            <div id="21023-2" class="code-item">21023-2</div>
+                            <div></div>
+
+                            <div id="231011" class="code-item">231011</div>
+                            <div id="231023-1" class="code-item">231023-1</div>
+                            <div id="231023-2-duplicate" class="code-item">231023-2</div>
+                            <div></div>
+
+                            <div id="231010" class="code-item">231010</div>
+                            <div id="230916" class="code-item">230916</div>
+                            <div id="230922" class="code-item">230922</div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">2f</h3> <!-- This "2f" is a standalone section title based on image layout -->
+                        <div class="grid-2f-first-light">
+                            <div></div> <!-- For "第一 開燈" title -->
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230301" class="code-item">230301</div>
+                            <div id="230220" class="code-item">230220</div>
+                            <div id="230128-first" class="code-item">230128</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230104" class="code-item">230104</div>
+
+                            <div id="231013-1" class="code-item">231013-1</div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230927" class="code-item">230927</div>
+                            <div id="230924" class="code-item">230924</div>
+                            <div id="230618-2" class="code-item">230618-2</div>
+                            <div id="230329" class="code-item">230329</div>
+                            <div id="230331" class="code-item">230331</div>
+                            <div id="230316" class="code-item">230316</div>
+                            <div id="230328" class="code-item">230328</div>
+                            <div id="230313" class="code-item">230313</div>
+                            <div id="230221" class="code-item">230221</div>
+                            <div id="230330-first" class="code-item">230330</div>
+                            <div id="230207" class="code-item">230207</div>
+                            <div id="230129-first" class="code-item">230129</div>
+                            <div id="230113" class="code-item">230113</div>
+                            <div id="230108-first" class="code-item">230108</div>
+
+
+                            <div></div>
+                            <div id="231013-2" class="code-item">231013-2</div>
+                            <div id="230812" class="code-item">230812</div>
+                            <div id="230909" class="code-item">230909</div>
+                            <div></div>
+                            <div id="230918" class="code-item">230918</div>
+                            <div id="230911" class="code-item">230911</div>
+                            <div id="230319" class="code-item">230319</div>
+                            <div></div>
+                            <div id="230325" class="code-item">230325</div>
+                            <div id="230327-second" class="code-item">230327</div>
+                            <div></div>
+                            <div id="230315-first" class="code-item">230315</div>
+                            <div id="230314" class="code-item">230314</div>
+                            <div id="230223" class="code-item">230223</div>
+                            <div id="230312-first" class="code-item">230312</div>
+                            <div></div>
+                            <div id="230217" class="code-item">230217</div>
+                            <div id="230205-first" class="code-item">230205</div>
+                            <div></div>
+                            <div></div>
+                            <div id="230114" class="code-item">230114</div>
+                            <div id="230111" class="code-item">230111</div>
+                            <div id="230118-first" class="code-item">230118</div>
+                            <div></div>
+                            <div id="230107" class="code-item">230107</div>
+
+                            <div id="230823" class="code-item">230823</div>
+                            <div id="230813" class="code-item">230813</div>
+                            <div id="230816" class="code-item">230816</div>
+                            <div id="230814-1" class="code-item">230814-1</div>
+                            <div id="230908" class="code-item">230908</div>
+                            <div id="230320-first" class="code-item">230320</div>
+                            <div></div>
+                            <div id="230323" class="code-item">230323</div>
+                            <div id="230318-first" class="code-item">230318</div>
+                            <div id="230309-first" class="code-item">230309</div>
+                            <div id="230225" class="code-item">230225</div>
+                            <div id="230224" class="code-item">230224</div>
+                            <div id="230214-first" class="code-item">230214</div>
+                            <div id="230130-first" class="code-item">230130</div>
+                            <div id="230204" class="code-item">230204</div>
+                            <div id="230105" class="code-item">230105</div>
+                            <div id="230121" class="code-item">230121</div>
+                            <div></div>
+                            <div id="230106" class="code-item">230106</div>
+                            <div id="230115-first" class="code-item">230115</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">2f</h3> <!-- Another "2f" section title -->
+                        <h4 class="text-xl font-semibold text-gray-700 mb-4">超長 中段</h4>
+                        <div class="grid-2f-super-long-middle">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230417" class="code-item">230417</div>
+                            <div></div>
+                            <div id="230413" class="code-item">230413</div>
+                            <div id="230409" class="code-item">230409</div>
+                            <div id="230102" class="code-item">230102</div>
+
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="230714" class="code-item">230714</div>
+                            <div id="230613-cd" class="code-item">230613 cd</div>
+                            <div></div>
+                            <div></div>
+                            <div id="230607" class="code-item">230607</div>
+                            <div id="230523" class="code-item">230523</div>
+                            <div id="230525" class="code-item">230525</div>
+                            <div></div>
+                            <div id="230514" class="code-item">230514</div>
+                            <div></div>
+                            <div id="230420" class="code-item">230420</div>
+                            <div></div>
+                            <div id="230419-1" class="code-item">230419-1</div>
+                            <div id="230415" class="code-item">230415</div>
+                            <div></div>
+                            <div></div>
+                            <div id="230404-3" class="code-item">230404-3</div>
+                            <div id="230402-3" class="code-item">230402-3</div>
+                            <div id="230401-2" class="code-item">230401-2</div>
+
+                            <div id="230724" class="code-item">230724</div>
+                            <div id="230702" class="code-item">230702</div>
+                            <div id="230707" class="code-item">230707</div>
+                            <div></div>
+                            <div id="230626" class="code-item">230626</div>
+                            <div></div>
+                            <div id="230605" class="code-item">230605</div>
+                            <div id="230618" class="code-item">230618</div>
+                            <div id="230529" class="code-item">230529</div>
+                            <div id="230508" class="code-item">230508</div>
+                            <div id="230509-2-CD" class="code-item">230509-2 CD</div>
+                            <div></div>
+                            <div id="230515-duplicate" class="code-item">230515</div>
+                            <div id="230506" class="code-item">230506</div>
+                            <div id="230418" class="code-item">230418</div>
+                            <div id="230410-duplicate" class="code-item">230410</div>
+                            <div id="230404-2" class="code-item">230404-2</div>
+                            <div id="230402-2" class="code-item">230402-2</div>
+                            <div id="230401-3" class="code-item">230401-3</div>
+
+                            <div id="230725" class="code-item">230725</div>
+                            <div id="230704" class="code-item">230704</div>
+                            <div id="230629-duplicate" class="code-item">230629</div>
+                            <div></div>
+                            <div id="230627-x" class="code-item">230627 x</div>
+                            <div></div>
+                            <div id="230612" class="code-item">230612</div>
+                            <div id="230613-2" class="code-item">230613 230603-2</div>
+                            <div id="230527-x" class="code-item">230527 x</div>
+                            <div></div>
+                            <div id="230509-duplicate" class="code-item">230509</div>
+                            <div></div>
+                            <div id="230520-duplicate" class="code-item">230520</div>
+                            <div id="230501-duplicate" class="code-item">230501</div>
+                            <div id="230419-2" class="code-item">230419-2</div>
+                            <div id="230415-2" class="code-item">230415-2</div>
+                            <div id="230404" class="code-item">230404</div>
+                            <div id="230402" class="code-item">230402</div>
+                            <div id="230401" class="code-item">230401</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">2f</h3> <!-- Another "2f" section title -->
+                        <h4 class="text-xl font-semibold text-gray-700 mb-4">面 電腦 前排</h4>
+                        <div class="grid-2f-computer-desk-front">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div id="231204" class="code-item">231204</div>
+                            <div id="240103" class="code-item">240103</div>
+                            <div id="240109" class="code-item">240109</div>
+                            <div id="240109-2-duplicate" class="code-item">240109-2</div>
+
+                            <div></div>
+                            <div id="231201" class="code-item">231201</div>
+                            <div id="231205" class="code-item">231205</div>
+                            <div id="240102" class="code-item">240102</div>
+                            <div id="240105" class="code-item">240105</div>
+
+                            <div></div>
+                            <div id="231121" class="code-item">231121</div>
+                            <div id="231207" class="code-item">231207</div>
+                            <div id="240104" class="code-item">240104</div>
+                            <div id="240101" class="code-item">240101</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="section-title">硬碟</h3>
+                        <div class="grid-2f-hard-drive">
+                            <div id="2F-hard-drive" class="code-item">硬碟</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 其他頁面 2 (範例) -->
+            <div id="other-page-2" class="page text-center p-8 bg-gray-100 rounded-lg shadow">
+                <h2 class="text-3xl font-semibold text-gray-700 mb-4">歡迎來到其他頁面 2</h2>
+                <p class="text-gray-600">這是另一個頁面，可以放置不同的功能或資訊。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const orderInput = document.getElementById('orderInput'); // New order input
+            const markOrderButton = document.getElementById('markOrderButton'); // New mark order button
+            const clearAllButton = document.getElementById('clearAllButton'); // New clear all button
+            const messageBox = document.getElementById('messageBox');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const pages = document.querySelectorAll('.page');
+            const backToSearchButtons = document.querySelectorAll('.back-to-search-button');
+
+            // Global lookup for all code elements. Stores elements by their text content (uppercase)
+            // If multiple elements have the same text content, it stores them in an array.
+            const codeLookup = {};
+            document.querySelectorAll('.code-item').forEach(element => {
+                const textContent = element.textContent.trim().toUpperCase();
+                if (!codeLookup[textContent]) {
+                    codeLookup[textContent] = element;
+                } else {
+                    if (!Array.isArray(codeLookup[textContent])) {
+                        codeLookup[textContent] = [codeLookup[textContent]];
+                    }
+                    codeLookup[textContent].push(element);
+                }
+            });
+
+            // Color cycle for orders
+            const orderColors = [
+                'order-color-0', // Green
+                'order-color-1', // Blue (already used by highlight, but will be overridden for order)
+                'order-color-2', // Yellow
+                'order-color-3', // Pink
+                'order-color-4', // Red
+                'order-color-5', // Purple
+                'order-color-6', // Teal
+                'order-color-7', // Orange
+                'order-color-8', // Gray
+                'order-color-9', // Cyan
+                'order-color-10', // Violet
+                'order-color-11' // Fuchsia
+            ];
+            let currentOrderColorIndex = 0;
+
+            // Function to remove all single search highlights (blue pulse)
+            const removeSingleSearchHighlight = () => {
+                document.querySelectorAll('.code-item.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                    el.style.backgroundColor = ''; // Remove inline style from highlight
+                    el.style.color = ''; // Remove inline style from highlight
+                    el.style.boxShadow = ''; // Remove inline style from highlight
+                    el.style.transform = ''; // Remove inline style from highlight
+                    el.style.animation = ''; // Remove inline style from highlight
+                });
+            };
+
+            // Function to remove all order color highlights
+            const removeOrderColors = () => {
+                document.querySelectorAll('.code-item').forEach(el => {
+                    orderColors.forEach(colorClass => {
+                        el.classList.remove(colorClass);
+                    });
+                    el.style.backgroundColor = ''; // Ensure no lingering inline styles
+                    el.style.color = '';
+                });
+            };
+
+            // Function to display messages
+            const displayMessage = (msg, isError = false) => {
+                messageBox.textContent = msg;
+                messageBox.className = `text-center text-lg font-medium mb-4 h-6 ${isError ? 'text-red-600' : 'text-green-600'}`;
+            };
+
+            // Search function (for single search, now supports partial match)
+            const searchCode = () => {
+                removeSingleSearchHighlight(); // Clear previous single search highlights
+                displayMessage(''); // Clear previous messages
+
+                const inputCode = searchInput.value.trim().toUpperCase();
+                if (!inputCode) {
+                    displayMessage('請輸入一個代號進行查詢。', true);
+                    return;
+                }
+
+                const matchedElements = [];
+                // Iterate through all actual elements to find partial matches
+                document.querySelectorAll('.code-item').forEach(element => {
+                    const displayCode = element.textContent.trim().toUpperCase();
+                    if (displayCode.startsWith(inputCode)) {
+                        matchedElements.push(element);
+                    }
+                });
+
+                if (matchedElements.length > 0) {
+                    // Navigate to the page of the first matched element
+                    const pageIdOfFirstElement = matchedElements[0].closest('.page').id;
+                    showPage(pageIdOfFirstElement);
+
+                    // Add a small delay to allow page transition before highlighting and scrolling
+                    setTimeout(() => {
+                        matchedElements.forEach(element => {
+                            // Ensure any existing order color is removed temporarily for the pulse highlight
+                            orderColors.forEach(colorClass => element.classList.remove(colorClass));
+                            element.classList.add('highlight');
+                        });
+                        // Scroll to the first matched element
+                        matchedElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        displayMessage(`已找到 ${matchedElements.length} 個代號以 "${inputCode}" 開頭！`, false);
+                    }, 300); // 300ms delay for page transition
+                } else {
+                    displayMessage(`找不到代號以 "${inputCode}" 開頭。請檢查輸入是否正確。`, true);
+                }
+            };
+
+            // Mark order function
+            const markOrder = () => {
+                removeSingleSearchHighlight(); // Clear any single search highlight
+                displayMessage('');
+
+                const orderCodesString = orderInput.value.trim();
+                if (!orderCodesString) {
+                    displayMessage('請輸入訂單代號（用逗號分隔）。', true);
+                    return;
+                }
+
+                const codesToMark = orderCodesString.toUpperCase().split(',').map(code => code.trim()).filter(code => code !== '');
+                if (codesToMark.length === 0) {
+                    displayMessage('無效的訂單代號輸入。', true);
+                    return;
+                }
+
+                const colorClass = orderColors[currentOrderColorIndex];
+                let foundAny = false;
+                let firstFoundElement = null;
+
+                codesToMark.forEach(code => {
+                    const elementCandidates = codeLookup[code];
+                    if (elementCandidates) {
+                        const elementsToColor = Array.isArray(elementCandidates) ? elementCandidates : [elementCandidates];
+                        elementsToColor.forEach(element => {
+                            // Remove any previous order colors from this specific element
+                            orderColors.forEach(color => element.classList.remove(color));
+                            // Apply the new order color
+                            element.classList.add(colorClass);
+                            element.classList.remove('highlight'); // Ensure pulse is removed if still there
+                            
+                            // Dynamically set background-color and color to override Tailwind/other classes
+                            // This ensures the order color takes precedence over default or highlight styles
+                            element.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue(`--tw-${colorClass.replace('order-color-', '')}`).trim();
+                            element.style.color = '#ffffff'; // White text for colored backgrounds
+                            element.style.boxShadow = ''; // Clear pulse box shadow
+                            element.style.transform = ''; // Clear pulse transform
+                            element.style.animation = ''; // Clear pulse animation
+
+                            if (!firstFoundElement) {
+                                firstFoundElement = element;
+                            }
+                            foundAny = true;
+                        });
+                    }
+                });
+
+                if (foundAny) {
+                    displayMessage(`訂單已標記為 ${orderColors[currentOrderColorIndex]} (第 ${currentOrderColorIndex + 1} 筆訂單)。`, false);
+                    orderInput.value = ''; // Clear order input after marking
+                    currentOrderColorIndex = (currentOrderColorIndex + 1) % orderColors.length; // Cycle color
+
+                    // Navigate to the page of the first found element in the order
+                    if (firstFoundElement) {
+                        const pageIdOfFirstElement = firstFoundElement.closest('.page').id;
+                        showPage(pageIdOfFirstElement);
+                        setTimeout(() => {
+                            firstFoundElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    }
+                } else {
+                    displayMessage('訂單中沒有找到任何代號。', true);
+                }
+            };
+
+            // Clear all highlights
+            const clearAll = () => {
+                removeSingleSearchHighlight();
+                removeOrderColors();
+                displayMessage('所有標記已清除。', false);
+            };
+
+            // Function to show a specific page
+            const showPage = (pageId) => {
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                const activePage = document.getElementById(pageId);
+                if (activePage) {
+                    activePage.classList.add('active');
+                    // Reset search input and message when switching pages (unless coming from search and staying on same page)
+                    if (pageId !== 'position-map-page') { // Only clear input if navigating away from search page
+                        searchInput.value = '';
+                        orderInput.value = '';
+                    }
+                    displayMessage('');
+                    // Do NOT remove order highlights here, as they persist across pages unless clearAll is pressed
+                    // removeHighlights(); // Removed to allow order marks to persist on page switch
+                }
+
+                // Update navigation button styles
+                navButtons.forEach(button => {
+                    if (button.dataset.page === pageId) {
+                        button.classList.remove('bg-gray-400', 'hover:bg-gray-500');
+                        button.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                    } else {
+                        button.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                        button.classList.add('bg-gray-400', 'hover:bg-gray-500');
+                    }
+                });
+            };
+
+            // Event Listeners
+            searchButton.addEventListener('click', searchCode);
+            searchInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    searchCode();
+                }
+            });
+
+            markOrderButton.addEventListener('click', markOrder);
+            orderInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    markOrder();
+                }
+            });
+
+            clearAllButton.addEventListener('click', clearAll);
+
+            // Optional: Click on a code item to see its ID in the search box and perform single search
+            document.querySelectorAll('.code-item').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    searchInput.value = event.target.textContent.trim();
+                    searchCode();
+                });
+            });
+
+            // Event Listeners for navigation buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const pageId = event.target.dataset.page;
+                    showPage(pageId);
+                });
+            });
+
+            // Event Listeners for "回到查詢" buttons
+            backToSearchButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showPage('position-map-page'); // Go back to the main search page
+                });
+            });
+
+            // Show the initial page (鐵皮屋位置相對圖) when the app loads
+            showPage('position-map-page');
+        });
+    </script>
+</body>
+</html>
